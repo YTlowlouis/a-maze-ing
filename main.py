@@ -4,6 +4,7 @@ from config_loader import MazeGenerator, ConfigError
 from maze_logic import Maze
 from render_maze import Renderer
 
+
 def main():
     # 1. Initialisation des outils
     render = Renderer()
@@ -50,14 +51,13 @@ def main():
     if not validated_conf.get("PERFECT", True):
         mazee.not_perfect()
 
-    mazee.inject_42()      # On dessine le "42"
     mazee.find_solution()  # On calcule la solution (BFS)
-    mazee.switch_path(False) # Cache le chemin par défaut
+    mazee.switch_path(False)  # Cache le chemin par défaut
 
     render.render_maze(mazee.maze)
 
     # État du chemin : 1 = Caché, 0 = Visible (selon ta logique de switch)
-    path_hidden = True 
+    path_hidden = True
 
     # 5. Boucle d'interaction (Menu)
     while True:
@@ -122,6 +122,7 @@ def main():
             print("Please enter a valid number.")
         except Exception as e:
             print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     main()

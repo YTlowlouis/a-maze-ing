@@ -1,5 +1,6 @@
-from typing import List, Union
+from typing import Union
 import random
+
 
 class ConfigError(Exception):
     def __init__(self, message: str):
@@ -74,6 +75,5 @@ class MazeGenerator():
                 raise ConfigError("Seed must be an integer")
         else:
             conf["SEED"] = random.randint(0, 10000000)
-
 
         return conf

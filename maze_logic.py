@@ -17,6 +17,7 @@ class Maze():
         self.maze = self.create_maze()
 
     def _load_conf(self, config: dict) -> str:
+    #"""mettre des raises au lieu de try except"""
         try:
             self.height = config.get("HEIGHT")
             self.width = config.get("WIDTH")
@@ -25,7 +26,6 @@ class Maze():
             self.exit = config.get("EXIT")
 
             return f"{[self. height, self.width, self.is_perfect, self.entry, self.exit]}"
-
         except Exception as e:
             return f"Error: {e}"
 
@@ -85,6 +85,8 @@ class Maze():
 
         offset_y = (maze_height - pattern_height) // 2
         offset_x = (maze_width - pattern_width) // 2
+        if self.height < 5 or self.width < 5:
+            return
 
         for y, line in enumerate(PATTERN_42):
             for x, char in enumerate(line):
@@ -164,7 +166,7 @@ class Maze():
                     v_pass = not self.maze[y-1][x].is_wall and not self.maze[y+1][x].is_wall
                     h_pass = not self.maze[y][x-1].is_wall and not self.maze[y][x+1].is_wall
 
-                    if v_pass ^ h_pass: 
+                    if v_pass ^ h_pass:
                         if random.randint(1, 15) == 1:
                             cell.is_wall = False
 

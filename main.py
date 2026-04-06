@@ -159,7 +159,13 @@ def main():
 
             elif choice == "3":
                 # Option Bonus : Change la couleur des murs dans le Renderer
-                colors = ["\033[41m", "\033[42m", "\033[44m", "\033[45m", "\033[46m"]
+                colors = [
+                    "\033[41m",
+                    "\033[42m",
+                    "\033[44m",
+                    "\033[45m",
+                    "\033[46m"
+                    ]
                 render.wall_color = random.choice(colors)
                 render.render_maze(mazee.maze)
                 print("Colors rotated!")

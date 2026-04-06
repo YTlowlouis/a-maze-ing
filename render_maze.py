@@ -14,13 +14,13 @@ PATTERN_42 = [
 ]
 
 
-class Renderer():
-    def __init__(self):
-        pass
+# class Renderer():
+#     def __init__(self):
+#         pass
 
-    def render_maze(self, maze) -> None:
-        x = 0
-        for i in maze:
-            for j in i:
-                j.print_self()
-            print("")
+#     def render_maze(self, maze) -> None:
+#         x = 0
+#         for i in maze:
+#             for j in i:
+#                 j.print_self()
+#             print("")

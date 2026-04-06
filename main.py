@@ -2,7 +2,7 @@ import sys
 import random
 from config_loader import MazeGenerator, ConfigError
 from maze_logic import Maze, path_to_directions
-from render_maze import Renderer
+from render_maze import Renderer, random_color
 
 
 def convert_to_hex(neighbors: dict) -> str:
@@ -158,15 +158,7 @@ def main():
                 render.render_maze(mazee.maze)
 
             elif choice == "3":
-                # Option Bonus : Change la couleur des murs dans le Renderer
-                colors = [
-                    "\033[41m",
-                    "\033[42m",
-                    "\033[44m",
-                    "\033[45m",
-                    "\033[46m"
-                    ]
-                render.wall_color = random.choice(colors)
+                render = Renderer()
                 render.render_maze(mazee.maze)
                 print("Colors rotated!")
 

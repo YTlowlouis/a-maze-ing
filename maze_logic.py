@@ -1,4 +1,4 @@
-from render_maze import BG_RED, BG_BLUE, BG_GREEN, RESET, BG_CYAN, PATTERN_42
+from render_maze import PATTERN_42, RESET, Colors
 from collections import deque
 import random
 
@@ -188,40 +188,43 @@ class Cell():
         self.w_south = False
         self.w_east = False
         self.w_west = False
+        self.exit_point = False
+        self.entry_point = False
 
-    def print_self(self):
+    def print_self(self, renderer) -> None:
         if self.is_path:
-            print(f"{BG_CYAN}  {RESET}", end="")
+            print(f"{renderer.path_color.value}  {RESET}", end="")
         elif self.is_42:
-            print("\033[43m  \033[0m", end="")
-        elif self.is_wall is True:
-            print(f"{BG_RED}  {RESET}", end="")
+            print(f"{renderer.is42_color.value}  {RESET}", end="")
+        elif self.is_wall:
+            print(f"{renderer.wall_color.value}  {RESET}", end="")
+        elif self.exit_point:
+            print(f"{renderer.exit_color.value}  {RESET}", end="")
+        elif self.entry_point:
+            print(f"{renderer.entry_color.value}  {RESET}", end="")
         else:
             print("  ", end="")
 
     def get_neighbors(self, maze, y, x):
         neighbors = {}
         directions = {'N': (-1, 0), 'S': (1, 0), 'W': (0, -1), 'E': (0, 1)}
-
         for dir, (dy, dx) in directions.items():
             ny, nx = y + dy, x + dx
-
             if 0 <= ny < len(maze) and 0 <= nx < len(maze[0]):
                 neighbors[dir] = maze[ny][nx].is_wall
             else:
-                neighbors[dir] = True  # bord = mur fermé
-
+                neighbors[dir] = True
         return neighbors
 
 
 class Entry(Cell):
-    def print_self(self):
-        print(f"{BG_BLUE}  {RESET}", end="")
+    def print_self(self, renderer):
+        print(f"{renderer.entry_color.value}  {RESET}", end="")
 
 
 class Exit(Cell):
-    def print_self(self):
-        print(f"{BG_GREEN}  {RESET}", end="")
+    def print_self(self, renderer):
+        print(f"{renderer.exit_color.value}  {RESET}", end="")
 
 
 def path_to_directions(path: list[tuple]) -> str:

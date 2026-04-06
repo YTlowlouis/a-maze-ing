@@ -1,4 +1,4 @@
-from render_maze import PATTERN_42, RESET, Colors
+from render_maze import PATTERN_42, RESET
 from collections import deque
 import random
 

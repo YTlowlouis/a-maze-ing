@@ -2,7 +2,7 @@ import sys
 import random
 from config_loader import MazeGenerator, ConfigError
 from maze_logic import Maze, path_to_directions
-from render_maze import Renderer, random_color
+from render_maze import Renderer
 
 
 def convert_to_hex(neighbors: dict) -> str:

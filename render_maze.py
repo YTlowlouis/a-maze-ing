@@ -6,16 +6,18 @@ BG_CYAN = "\033[46m"
 RESET = "\033[0m"
 
 PATTERN_42 = [
-    "X . XXX",
-    "X .   X",
+    "X   XXX",
+    "X     X",
     "XXX XXX",
     "  X X  ",
-    ". X XXX"
+    "  X XXX"
 ]
+
 
 class Renderer():
     def __init__(self):
         pass
+
     def render_maze(self, maze) -> None:
         x = 0
         for i in maze:

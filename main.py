@@ -1,8 +1,19 @@
 import sys
 import random
 from config_loader import MazeGenerator, ConfigError
-from maze_logic import Maze
+from maze_logic import Maze, path_to_directions
 from render_maze import Renderer
+
+
+def convert_to_hex(neighbors: dict) -> str:
+    n = '0' if not neighbors['N'] else '1'
+    e = '0' if not neighbors['E'] else '1'
+    s = '0' if not neighbors['S'] else '1'
+    w = '0' if not neighbors['W'] else '1'
+
+    binary = w + s + e + n
+    return hex(int(binary, 2))[2:].upper()
+
 
 def main():
     # 1. Initialisation des outils
@@ -49,17 +60,43 @@ def main():
     # Si la config demande un labyrinthe NON-parfait (False)
     if not validated_conf.get("PERFECT", True):
         mazee.not_perfect()
+    raw_path = mazee.find_solution()
+    # print(f"Raw path (coordinates): {raw_path}")
+    path_directions = path_to_directions(raw_path)
+    # print(f"Dir path (coordinates): {path_directions}")
+    path_directions = path_directions[::-1]
+    # print(f"Dir path (coordinates): {path_directions}")
 
-    mazee.inject_42()      # On dessine le "42"
-    mazee.find_solution()  # On calcule la solution (BFS)
-    mazee.switch_path(False) # Cache le chemin par défaut
+    mazee.switch_path(False)  # Cache le chemin par défaut
 
     render.render_maze(mazee.maze)
 
     # État du chemin : 1 = Caché, 0 = Visible (selon ta logique de switch)
-    path_hidden = True 
+    path_hidden = True
+    # generation du file.txt
+    # a_test = {}
+    # for y, row in enumerate(mazee.maze):
+    #     for x, cell in enumerate(row):
+    #         neighbors = cell.get_neighbors(mazee.maze, y, x)
+    #         a_test[(y, x)] = convert_to_hex(neighbors)
+    #         print(neighbors)
+    # print(a_test.values())
+
+    with open(validated_conf["OUTPUT_FILE"], 'w') as f:
+        for y, row in enumerate(mazee.maze):
+            to_write = ""
+            for x, cell in enumerate(row):
+                neighbors = cell.get_neighbors(mazee.maze, y, x)
+                to_write += convert_to_hex(neighbors)
+            f.write(to_write)
+            f.write('\n')
+        f.write('\n')
+        f.write(f"{mazee.entry[0]},{mazee.entry[1]}\n")
+        f.write(f"{mazee.exit[0]},{mazee.exit[1]}\n")
+        f.write(str(path_directions[::-1]))
 
     # 5. Boucle d'interaction (Menu)
+
     while True:
         print("\n=== A-MAZE-ING MENU ===")
         print("1. Regenerate new maze")
@@ -79,23 +116,35 @@ def main():
                 # On recrée l'objet
                 mazee = Maze(validated_conf)
 
-                mazee.inject_42()
+                # mazee.inject_42()
                 mazee.create_paths()
 
                 # On respecte la règle PERFECT du sujet [cite: 122, 141]
                 if not validated_conf.get("PERFECT"):
                     mazee.not_perfect()
+                raw_path = mazee.find_solution()
 
+                if raw_path is None:
+                    print("No path found")
+                    return
 
-                # CRUCIAL : On calcule la solution tout de suite pour l'avoir en mémoire [cite: 157, 224]
-                mazee.find_solution() 
-
-                # On s'assure que le chemin est caché au départ
+                path_directions = path_to_directions(raw_path)
+                path_directions = path_directions[::-1]
                 mazee.switch_path(False)
                 path_hidden = True
-
-                # On affiche le nouveau labyrinthe vide de solution
                 render.render_maze(mazee.maze)
+                with open(validated_conf["OUTPUT_FILE"], 'w') as f:
+                    for y, row in enumerate(mazee.maze):
+                        to_write = ""
+                        for x, cell in enumerate(row):
+                            neighbors = cell.get_neighbors(mazee.maze, y, x)
+                            to_write += convert_to_hex(neighbors)
+                        f.write(to_write)
+                        f.write('\n')
+                    f.write('\n')
+                    f.write(f"{mazee.entry[0]},{mazee.entry[1]}\n")
+                    f.write(f"{mazee.exit[0]},{mazee.exit[1]}\n")
+                    f.write(str(path_directions[::-1]))
 
             elif choice == "2":
                 # Si path_hidden est True, on passe à False (on montre)
@@ -122,6 +171,7 @@ def main():
             print("Please enter a valid number.")
         except Exception as e:
             print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,6 @@
-from render_maze import BG_RED, BG_BLUE, BG_GREEN, RESET, BG_CYAN, PATTERN_42, Renderer
-import time
-import random
+from render_maze import BG_RED, BG_BLUE, BG_GREEN, RESET, BG_CYAN, PATTERN_42
 from collections import deque
+import random
 
 
 class Maze():
@@ -16,18 +15,30 @@ class Maze():
         self.path: list[tuple] = []
         self.maze = self.create_maze()
 
-    def _load_conf(self, config: dict) -> str:
-    #"""mettre des raises au lieu de try except"""
-        try:
-            self.height = config.get("HEIGHT")
-            self.width = config.get("WIDTH")
-            self.is_perfect = config.get("IS_PERFECT")
-            self.entry = config.get("ENTRY")
-            self.exit = config.get("EXIT")
+    def _load_conf(self, config: dict) -> list:
+        self.height = config.get("HEIGHT")
+        if self.height is None:
+            raise Exception("Missing key: HEIGHT")
+        self.width = config.get("WIDTH")
+        if self.width is None:
+            raise Exception("Missing key: WIDTH")
+        self.is_perfect = config.get("PERFECT")
+        if self.is_perfect is None:
+            raise Exception("Missing key: IS_PERFECT")
+        self.entry = config.get("ENTRY")
+        if self.entry is None:
+            raise Exception("Missing key: ENTRY")
+        self.exit = config.get("EXIT")
+        if self.exit is None:
+            raise Exception("Missing key: EXIT")
 
-            return f"{[self. height, self.width, self.is_perfect, self.entry, self.exit]}"
-        except Exception as e:
-            return f"Error: {e}"
+        return [
+            self.height,
+            self.width,
+            self.is_perfect,
+            self.entry,
+            self.exit
+            ]
 
     def create_maze(self) -> list:
         maze = []
@@ -42,6 +53,8 @@ class Maze():
                     true_or_false = i % 2 == 0 or j % 2 == 0
                     lst_temp.append(Cell(true_or_false))
             maze.append(lst_temp)
+        self.maze = maze
+        self.inject_42()
         return maze
 
     def _get_unvisited_neighbors(self, current_y, current_x) -> list[tuple]:
@@ -50,15 +63,15 @@ class Maze():
 
         for dy, dx in directions:
             next_y, next_x = current_y + dy, current_x + dx
-
-            if 0 <= next_x < self.width * 2 + 1 and 0 <= next_y < self.height * 2 + 1:
+            if 0 <= next_x < self.width * 2 + 1 \
+                    and 0 <= next_y < self.height * 2 + 1:
                 neighbor = self.maze[next_y][next_x]
                 if not neighbor.is_wall and not neighbor.is_visited:
                     unvisitied_neighbors.append((next_y, next_x))
-
         return unvisitied_neighbors
 
-    def _break_wall(self, cell1: tuple[int, int], cell2: tuple[int, int]) -> None:
+    def _break_wall(self, cell1: tuple[int, int],
+                    cell2: tuple[int, int]) -> None:
         y_wall = (cell1[0] + cell2[0]) // 2
         x_wall = (cell1[1] + cell2[1]) // 2
         self.maze[y_wall][x_wall].is_wall = False
@@ -67,7 +80,8 @@ class Maze():
         stack = [(1, 1)]
         self.maze[1][1].is_visited = True
         while stack:
-            neighbors = self._get_unvisited_neighbors(stack[-1][0], stack[-1][1])
+            current_y, current_x = stack[-1]
+            neighbors = self._get_unvisited_neighbors(current_y, current_x)
             if neighbors:
                 pos_y, pos_x = random.choice(neighbors)
                 self._break_wall(stack[-1], (pos_y, pos_x))
@@ -77,44 +91,36 @@ class Maze():
                 stack.pop()
 
     def inject_42(self):
-        maze_height = len(self.maze)
-        maze_width = len(self.maze[0])
-
-        pattern_height = len(PATTERN_42)
-        pattern_width = len(PATTERN_42[0])
-
-        offset_y = (maze_height - pattern_height) // 2
-        offset_x = (maze_width - pattern_width) // 2
         if self.height < 5 or self.width < 5:
+            print("Maze too small to show 42")
             return
+        pattern = PATTERN_42
+        offset_y = (self.height - len(pattern)) // 2
+        offset_x = (self.width - len(pattern[0])) // 2
 
-        for y, line in enumerate(PATTERN_42):
-            for x, char in enumerate(line):
-                target_y = offset_y + y
-                target_x = offset_x + x
-
-                if target_y < len(self.maze) and target_x < len(self.maze[0]):
-                    if char == "X":
-                        self.maze[target_y][target_x].is_wall = True
-                        self.maze[target_y][target_x].is_42 = True
-                        self.maze[target_y][target_x].is_visited = True
-                    elif char == " ":
-                        self.maze[target_y][target_x].is_wall = False
-                        self.maze[target_y][target_x].is_visited = True
-                    elif char == ".":
-                        self.maze[target_y][target_x].is_wall = True
-
+        for py, row in enumerate(pattern):
+            for px, char in enumerate(row):
+                y = (offset_y + py) * 2 + 1
+                x = (offset_x + px) * 2 + 1
+                cell = self.maze[y][x]
+                if char == "X":
+                    cell.is_wall = True
+                    cell.is_42 = True
+                    cell.is_visited = True
+                elif char == " ":
+                    cell.is_wall = False
+                    cell.is_visited = False
 
     def _get_walkable_neighbors(self, cell: tuple[int, int]) -> list[tuple]:
         directions = [(0, 1), (1, 0), (-1, 0), (0, -1)]
         neighbors = []
         for dy, dx in directions:
             next_y, next_x = cell[0] + dy, cell[1] + dx
-            if 0 <= next_y < self.height * 2 + 1 and 0 <= next_x < self.width * 2 + 1:
+            if 0 <= next_y < self.height * 2 + 1 \
+                    and 0 <= next_x < self.width * 2 + 1:
                 if not self.maze[next_y][next_x].is_wall:
                     neighbors.append(tuple([next_y, next_x]))
         return neighbors
-
 
     def _reconstruct_path(self, moves, target):
         path = []
@@ -127,25 +133,24 @@ class Maze():
         return path[::-1]
 
     def find_solution(self):
+        for row in self.maze:
+            for cell in row:
+                cell.is_path = False
+
         entry = tuple(self.entry)
         target = tuple(self.exit)
 
         moves = {entry: None}
-        queue = []
-        queue.append(entry)
+        queue = deque([entry])
 
         while queue:
-            current = queue[0]
-            queue.remove(queue[0])
-
+            current = queue.popleft()
             if current == target:
                 return self._reconstruct_path(moves, target)
-
             for neighbor in self._get_walkable_neighbors(current):
                 if neighbor not in moves:
                     moves[neighbor] = current
                     queue.append(neighbor)
-
         return None
 
     def switch_path(self, show: bool) -> None:
@@ -163,13 +168,14 @@ class Maze():
                     if y % 2 == 0 and x % 2 == 0:
                         continue
 
-                    v_pass = not self.maze[y-1][x].is_wall and not self.maze[y+1][x].is_wall
-                    h_pass = not self.maze[y][x-1].is_wall and not self.maze[y][x+1].is_wall
+                    v_pass = not self.maze[y-1][x].is_wall and \
+                        not self.maze[y+1][x].is_wall
+                    h_pass = not self.maze[y][x-1].is_wall and \
+                        not self.maze[y][x+1].is_wall
 
                     if v_pass ^ h_pass:
                         if random.randint(1, 15) == 1:
                             cell.is_wall = False
-
 
 
 class Cell():
@@ -178,16 +184,35 @@ class Cell():
         self.is_visited = False
         self.is_42 = False
         self.is_path = False
+        self.w_north = False
+        self.w_south = False
+        self.w_east = False
+        self.w_west = False
 
     def print_self(self):
         if self.is_path:
             print(f"{BG_CYAN}  {RESET}", end="")
         elif self.is_42:
-            print(f"\033[43m  \033[0m", end="")
+            print("\033[43m  \033[0m", end="")
         elif self.is_wall is True:
             print(f"{BG_RED}  {RESET}", end="")
         else:
-            print(f"  ", end="")
+            print("  ", end="")
+
+    def get_neighbors(self, maze, y, x):
+        neighbors = {}
+        directions = {'N': (-1, 0), 'S': (1, 0), 'W': (0, -1), 'E': (0, 1)}
+
+        for dir, (dy, dx) in directions.items():
+            ny, nx = y + dy, x + dx
+
+            if 0 <= ny < len(maze) and 0 <= nx < len(maze[0]):
+                neighbors[dir] = maze[ny][nx].is_wall
+            else:
+                neighbors[dir] = True  # bord = mur fermé
+
+        return neighbors
+
 
 class Entry(Cell):
     def print_self(self):
@@ -199,3 +224,20 @@ class Exit(Cell):
         print(f"{BG_GREEN}  {RESET}", end="")
 
 
+def path_to_directions(path: list[tuple]) -> str:
+    moves = []
+
+    for i in range(1, len(path)):
+        y0, x0 = path[i-1]
+        y1, x1 = path[i]
+
+        if y1 < y0:
+            moves.append("N")
+        elif y1 > y0:
+            moves.append("S")
+        elif x1 < x0:
+            moves.append("W")
+        elif x1 > x0:
+            moves.append("E")
+
+    return "".join(moves)

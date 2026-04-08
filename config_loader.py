@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 import random
 
 
@@ -12,7 +12,7 @@ class ConfigError(Exception):
 
 
 class MazeGenerator():
-    def get_conf(self, config_file: str) -> dict:
+    def get_conf(self, config_file: str) -> dict[str, str]:
         dct = {}
         try:
             with open(config_file, "r") as f:
@@ -33,11 +33,12 @@ class MazeGenerator():
 
         return dct
 
-    def validate_conf(self, conf_dict: dict) -> dict:
+    def validate_conf(self,
+                      conf_dict: dict) -> dict:
         if not isinstance(conf_dict, dict):
             raise ConfigError("Config is not a dict")
 
-        conf = {}
+        conf: dict[str, Union[int, bool, str, tuple[int, int] | None]] = {}
         rules = {
             "WIDTH": int,
             "HEIGHT": int,
@@ -53,7 +54,6 @@ class MazeGenerator():
 
         for key, expected_type in rules.items():
             try:
-                expected_type(conf_dict[key])
                 if key == "ENTRY" or key == "EXIT":
                     if "," not in conf_dict[key]:
                         raise ConfigError(f"{key} must have ','"
@@ -61,21 +61,22 @@ class MazeGenerator():
                     if len(conf_dict[key].split(',')) != 2:
                         raise ConfigError(f"{key} must have only two values"
                                           " as coordinates")
-                    if int(conf_dict[key].split(',')[0]) >= \
-                        int(conf_dict["HEIGHT"]) * 2 or \
-                        int(conf_dict[key].split(',')[1]) >= \
-                            int(conf_dict["WIDTH"]) * 2:
+                    if (
+                        int(conf_dict[key].split(',')[0]) >=
+                        int(conf_dict["HEIGHT"]) * 2
+                        or int(conf_dict[key].split(',')[1]) >=
+                        int(conf_dict["WIDTH"]) * 2
+                    ):
                         raise ConfigError(f"{key} must be"
                                           " inside the maze")
-
-                    expected_type(conf_dict[key])
-                    conf[key] = [int(conf_dict[key].split(",")[0]),
-                                 int(conf_dict[key].split(",")[1])]
+                    conf[key] = (int(conf_dict[key].split(",")[0]),
+                                 int(conf_dict[key].split(",")[1]))
                 elif key == "WIDTH" or key == "HEIGHT":
-                    conf[key] = expected_type(conf_dict[key])
-                    if conf[key] < 3:
-                        raise ConfigError(f"Parameter: {key} cannot"
-                                          " be less than 3")
+                    # conf[key] = expected_type(conf_dict[key])
+                    value = expected_type(conf_dict[key])
+                    if value < 3:
+                        raise ConfigError(f"Parameter: {key} too short")
+                    conf[key] = value
                 elif key == "PERFECT":
                     if conf_dict["PERFECT"].lower() not in ["true", "false"]:
                         raise ConfigError("PERFECT must be True or False")
@@ -94,7 +95,6 @@ class MazeGenerator():
         if conf["ENTRY"] == conf["EXIT"]:
             raise ConfigError("Entry point and Exit point"
                               " cannot be the same")
-
         if "SEED" in conf_dict:
             try:
                 conf["SEED"] = int(conf_dict["SEED"])
@@ -102,5 +102,4 @@ class MazeGenerator():
                 raise ConfigError("Seed must be an integer")
         else:
             conf["SEED"] = random.randint(0, 10000000)
-
         return conf

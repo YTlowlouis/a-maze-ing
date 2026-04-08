@@ -1,4 +1,4 @@
-from .render_maze import PATTERN_42, RESET
+from .render_maze import PATTERN_42, RESET, Renderer
 from collections import deque
 import random
 
@@ -9,28 +9,18 @@ class Maze():
         self.height: int
         self.width: int
         self.is_perfect: bool
-        self.entry: list[int, int]
-        self.exit: list[int, int]
+        self.entry: tuple[int, int]
+        self.exit: tuple[int, int]
         self._load_conf(config)
         self.path: list[tuple] = []
         self.maze = self.create_maze()
 
     def _load_conf(self, config: dict) -> list:
-        self.height = config.get("HEIGHT")
-        if self.height is None:
-            raise Exception("Missing key: HEIGHT")
-        self.width = config.get("WIDTH")
-        if self.width is None:
-            raise Exception("Missing key: WIDTH")
-        self.is_perfect = config.get("PERFECT")
-        if self.is_perfect is None:
-            raise Exception("Missing key: IS_PERFECT")
-        self.entry = config.get("ENTRY")
-        if self.entry is None:
-            raise Exception("Missing key: ENTRY")
-        self.exit = config.get("EXIT")
-        if self.exit is None:
-            raise Exception("Missing key: EXIT")
+        self.height = config["HEIGHT"]
+        self.width = config["WIDTH"]
+        self.is_perfect = config["PERFECT"]
+        self.entry = config["ENTRY"]
+        self.exit = config["EXIT"]
 
         return [
             self.height,
@@ -43,7 +33,7 @@ class Maze():
     def create_maze(self) -> list:
         maze = []
         for i in range(self.height * 2 + 1):
-            lst_temp = []
+            lst_temp: list[Cell] = []
             for j in range(self.width * 2 + 1):
                 if i == self.entry[0] and j == self.entry[1]:
                     lst_temp.append(Entry())
@@ -57,7 +47,9 @@ class Maze():
         self.inject_42()
         return maze
 
-    def _get_unvisited_neighbors(self, current_y, current_x) -> list[tuple]:
+    def _get_unvisited_neighbors(self,
+                                 current_y: int,
+                                 current_x: int) -> list[tuple]:
         unvisitied_neighbors = []
         directions = [(0, 2), (0, -2), (2, 0), (-2, 0)]
 
@@ -76,7 +68,7 @@ class Maze():
         x_wall = (cell1[1] + cell2[1]) // 2
         self.maze[y_wall][x_wall].is_wall = False
 
-    def create_paths(self):
+    def create_paths(self) -> None:
         stack = [(1, 1)]
         self.maze[1][1].is_visited = True
         while stack:
@@ -90,7 +82,7 @@ class Maze():
             else:
                 stack.pop()
 
-    def inject_42(self):
+    def inject_42(self) -> None:
         if self.height < 5 or self.width < 5:
             print("Maze too small to show 42")
             return
@@ -122,9 +114,12 @@ class Maze():
                     neighbors.append(tuple([next_y, next_x]))
         return neighbors
 
-    def _reconstruct_path(self, moves, target):
+    def _reconstruct_path(self,
+                          moves: dict[tuple[int, int], tuple[int, int] | None],
+                          target: tuple[int, int]
+                          ) -> list[tuple[int, int]]:
         path = []
-        current = target
+        current: tuple[int, int] | None = target
         while current is not None:
             path.append(current)
             self.maze[current[0]][current[1]].is_path = True
@@ -132,15 +127,15 @@ class Maze():
         self.path = path[::-1]
         return path[::-1]
 
-    def find_solution(self):
+    def find_solution(self) -> list[tuple[int, int]] | None:
         for row in self.maze:
             for cell in row:
                 cell.is_path = False
 
-        entry = tuple(self.entry)
-        target = tuple(self.exit)
-
-        moves = {entry: None}
+        entry = self.entry
+        target: tuple[int, int] = self.exit
+        print(self.exit)
+        moves: dict[tuple[int, int], tuple[int, int] | None] = {entry: None}
         queue = deque([entry])
 
         while queue:
@@ -159,7 +154,7 @@ class Maze():
         for curr_y, curr_x in self.path:
             self.maze[curr_y][curr_x].is_path = show
 
-    def not_perfect(self):
+    def not_perfect(self) -> None:
         for y in range(1, len(self.maze) - 1):
             for x in range(1, len(self.maze[y]) - 1):
                 cell = self.maze[y][x]
@@ -191,7 +186,7 @@ class Cell():
         self.exit_point = False
         self.entry_point = False
 
-    def print_self(self, renderer) -> None:
+    def print_self(self, renderer: Renderer) -> None:
         if self.is_path:
             print(f"{renderer.path_color.value}  {RESET}", end="")
         elif self.is_42:
@@ -205,7 +200,7 @@ class Cell():
         else:
             print("  ", end="")
 
-    def get_neighbors(self, maze, y, x):
+    def get_neighbors(self, maze: list, y: int, x: int) -> dict[str, bool]:
         neighbors = {}
         directions = {'N': (-1, 0), 'S': (1, 0), 'W': (0, -1), 'E': (0, 1)}
         for dir, (dy, dx) in directions.items():
@@ -218,18 +213,19 @@ class Cell():
 
 
 class Entry(Cell):
-    def print_self(self, renderer):
+    def print_self(self, renderer: Renderer) -> None:
         print(f"{renderer.entry_color.value}  {RESET}", end="")
 
 
 class Exit(Cell):
-    def print_self(self, renderer):
+    def print_self(self, renderer: Renderer) -> None:
         print(f"{renderer.exit_color.value}  {RESET}", end="")
 
 
-def path_to_directions(path: list[tuple]) -> str:
+def path_to_directions(path: list[tuple[int, int]] | None) -> str:
     moves = []
-
+    if path is None:
+        return "No path found"
     for i in range(1, len(path)):
         y0, x0 = path[i-1]
         y1, x1 = path[i]

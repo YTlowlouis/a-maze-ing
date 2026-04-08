@@ -7,3 +7,7 @@ Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 
 # a-maze-ing
+
+python3 -m build
+
+pip install dist/mazegen-1.0.0-py3-none-any.whl

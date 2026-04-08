@@ -1,10 +1,12 @@
 import random
 from .maze_logic import Maze
+from typing import Any
 
 
 class MazeGenerator():
     def __init__(self, width: int, height: int,
-                 perfect: bool = True, seed: int = None):
+                 perfect: bool = True,
+                 seed: int | None = None) -> None:
         self.width = width
         self.height = height
         self.seed = seed
@@ -14,7 +16,7 @@ class MazeGenerator():
         if seed is not None:
             random.seed(seed)
 
-    def generate(self):
+    def generate(self) -> None:
         config = {
             "WIDTH": self.width,
             "HEIGHT": self.height,
@@ -33,8 +35,8 @@ class MazeGenerator():
         self.path = maze.find_solution()
         self.maze = maze.maze
 
-    def get_maze(self):
+    def get_maze(self) -> list[Any]:
         return self.maze
 
-    def get_solution(self):
+    def get_solution(self) -> list[tuple[int, int]] | None:
         return self.path

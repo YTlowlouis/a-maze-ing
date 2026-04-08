@@ -1,8 +1,8 @@
 import sys
 import random
 from config_loader import MazeGenerator, ConfigError
-from maze_logic import Maze, path_to_directions
-from repo_42.mazegen.render_maze import Renderer
+from mazegen.maze_logic import Maze, path_to_directions
+from mazegen.render_maze import Renderer
 
 
 def convert_to_hex(neighbors: dict) -> str:
@@ -15,7 +15,7 @@ def convert_to_hex(neighbors: dict) -> str:
     return hex(int(binary, 2))[2:].upper()
 
 
-def main():
+def main() -> None:
     # 1. Initialisation des outils
     render = Renderer()
     generator = MazeGenerator()
@@ -57,30 +57,14 @@ def main():
     print("Generating maze...")
     mazee.create_paths()
 
-    # Si la config demande un labyrinthe NON-parfait (False)
     if not validated_conf.get("PERFECT", True):
         mazee.not_perfect()
     raw_path = mazee.find_solution()
-    # print(f"Raw path (coordinates): {raw_path}")
     path_directions = path_to_directions(raw_path)
-    # print(f"Dir path (coordinates): {path_directions}")
     path_directions = path_directions[::-1]
-    # print(f"Dir path (coordinates): {path_directions}")
-
-    mazee.switch_path(False)  # Cache le chemin par défaut
-
+    mazee.switch_path(False)
     render.render_maze(mazee.maze)
-
-    # État du chemin : 1 = Caché, 0 = Visible (selon ta logique de switch)
     path_hidden = True
-    # generation du file.txt
-    # a_test = {}
-    # for y, row in enumerate(mazee.maze):
-    #     for x, cell in enumerate(row):
-    #         neighbors = cell.get_neighbors(mazee.maze, y, x)
-    #         a_test[(y, x)] = convert_to_hex(neighbors)
-    #         print(neighbors)
-    # print(a_test.values())
 
     with open(validated_conf["OUTPUT_FILE"], 'w') as f:
         for y, row in enumerate(mazee.maze):
@@ -113,13 +97,8 @@ def main():
 
             elif choice == "1":
                 print("Regenerating a new maze...")
-                # On recrée l'objet
                 mazee = Maze(validated_conf)
-
-                # mazee.inject_42()
                 mazee.create_paths()
-
-                # On respecte la règle PERFECT du sujet [cite: 122, 141]
                 if not validated_conf.get("PERFECT"):
                     mazee.not_perfect()
                 raw_path = mazee.find_solution()
@@ -147,14 +126,8 @@ def main():
                     f.write(str(path_directions[::-1]))
 
             elif choice == "2":
-                # Si path_hidden est True, on passe à False (on montre)
-                # Si path_hidden est False, on passe à True (on cache)
                 path_hidden = not path_hidden
-
-                # On appelle l'animation ou l'affichage simple
                 mazee.switch_path(not path_hidden)
-
-                # On redessine pour voir le changement
                 render.render_maze(mazee.maze)
 
             elif choice == "3":

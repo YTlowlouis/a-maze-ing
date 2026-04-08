@@ -13,7 +13,7 @@ class Colors(Enum):
 RESET = "\033[0m"
 
 
-def random_color():
+def random_color() -> str:
     return random.choice(list(Colors)).value
 
 
@@ -27,7 +27,7 @@ PATTERN_42 = [
 
 
 class Renderer():
-    def __init__(self):
+    def __init__(self) -> None:
         list_colors = list(Colors)
         self.wall_color = random.choice(list_colors)
         list_colors.remove(self.wall_color)
@@ -40,7 +40,7 @@ class Renderer():
         self.is42_color = random.choice(list_colors)
         list_colors.remove(self.is42_color)
 
-    def render_maze(self, maze):
+    def render_maze(self, maze: list[list]) -> None:
         for row in maze:
             for cell in row:
                 cell.print_self(self)

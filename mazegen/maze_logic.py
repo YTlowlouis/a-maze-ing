@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-from render_maze import BG_RED, BG_BLUE, BG_GREEN, RESET, BG_CYAN, PATTERN_42
-=======
-from render_maze import PATTERN_42, RESET
+from .render_maze import PATTERN_42, RESET
 from collections import deque
->>>>>>> 0e58982b0c58b0140759a10d61a00c745133bc15
 import random
 
 
@@ -64,6 +60,7 @@ class Maze():
     def _get_unvisited_neighbors(self, current_y, current_x) -> list[tuple]:
         unvisitied_neighbors = []
         directions = [(0, 2), (0, -2), (2, 0), (-2, 0)]
+
         for dy, dx in directions:
             next_y, next_x = current_y + dy, current_x + dx
             if 0 <= next_x < self.width * 2 + 1 \
@@ -101,24 +98,6 @@ class Maze():
         offset_y = (self.height - len(pattern)) // 2
         offset_x = (self.width - len(pattern[0])) // 2
 
-<<<<<<< HEAD
-        for y, line in enumerate(PATTERN_42):
-            for x, char in enumerate(line):
-                target_y = offset_y + y
-                target_x = offset_x + x
-
-                if target_y < len(self.maze) and target_x < len(self.maze[0]):
-                    if char == "X":
-                        self.maze[target_y][target_x].is_wall = True
-                        self.maze[target_y][target_x].is_42 = True
-                        self.maze[target_y][target_x].is_visited = True
-                    elif char == " ":
-                        self.maze[target_y][target_x].is_wall = True
-                        self.maze[target_y][target_x].is_visited = False
-                    elif char == ".":
-                        self.maze[target_y][target_x].is_wall = False
-                        self.maze[target_y][target_x].is_visited = False
-=======
         for py, row in enumerate(pattern):
             for px, char in enumerate(row):
                 y = (offset_y + py) * 2 + 1
@@ -131,7 +110,6 @@ class Maze():
                 elif char == " ":
                     cell.is_wall = False
                     cell.is_visited = False
->>>>>>> 0e58982b0c58b0140759a10d61a00c745133bc15
 
     def _get_walkable_neighbors(self, cell: tuple[int, int]) -> list[tuple]:
         directions = [(0, 1), (1, 0), (-1, 0), (0, -1)]
@@ -217,14 +195,6 @@ class Cell():
         if self.is_path:
             print(f"{renderer.path_color.value}  {RESET}", end="")
         elif self.is_42:
-<<<<<<< HEAD
-            print("\033[43m  \033[0m", end="")
-        elif self.is_wall is True:
-            print(f"{BG_RED}  {RESET}", end="")
-        else:
-            print("  ", end="")
-
-=======
             print(f"{renderer.is42_color.value}  {RESET}", end="")
         elif self.is_wall:
             print(f"{renderer.wall_color.value}  {RESET}", end="")
@@ -246,7 +216,6 @@ class Cell():
                 neighbors[dir] = True
         return neighbors
 
->>>>>>> 0e58982b0c58b0140759a10d61a00c745133bc15
 
 class Entry(Cell):
     def print_self(self, renderer):
@@ -254,10 +223,6 @@ class Entry(Cell):
 
 
 class Exit(Cell):
-<<<<<<< HEAD
-    def print_self(self):
-        print(f"{BG_GREEN}  {RESET}", end="")
-=======
     def print_self(self, renderer):
         print(f"{renderer.exit_color.value}  {RESET}", end="")
 
@@ -279,4 +244,3 @@ def path_to_directions(path: list[tuple]) -> str:
             moves.append("E")
 
     return "".join(moves)
->>>>>>> 0e58982b0c58b0140759a10d61a00c745133bc15

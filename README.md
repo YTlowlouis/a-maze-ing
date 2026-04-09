@@ -1,4 +1,4 @@
-_This project has been created as part of the 42 curriculum by <login1>[, <login2>[, <login3>[...]]]._\
+_This project has been created as part of the 42 curriculum by loboehm fchaput
 
 # A-Maze-ing
 
@@ -105,8 +105,8 @@ These parts can be reused in other maze applications, game prototypes, or comman
 ## Team and project management
 
 - Team members and roles:
-  - `<login1>` — project design, maze generation, config validation, documentation
-  - `<login2>` — optional teammate role if applicable
+  - `<fchaput>` —  config validation, documentation, norm
+  - `<loboehm>` —  project design, maze generation
 
 - Planning and evolution:
   - Initial plan: parse configuration, build grid, generate maze, render output.
@@ -125,8 +125,9 @@ These parts can be reused in other maze applications, game prototypes, or comman
   - Improve output format documentation for external tools.
 
 - Tools used:
-  - Python 3
-  - VS Code or any code editor
+  - Python 3.10
+  - Module build to enables the package
+  - VS Code or NVIM
   - Terminal / shell for execution
   - Git for version control
 

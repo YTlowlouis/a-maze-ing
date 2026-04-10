@@ -53,7 +53,7 @@ def main() -> None:
     # 4. Génération initiale
     print("Generating maze...")
     mazee.create_paths()
-
+    print(validated_conf)
     if not validated_conf.get("PERFECT", True):
         mazee.not_perfect()
     raw_path = mazee.find_solution()

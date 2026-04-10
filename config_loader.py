@@ -84,10 +84,12 @@ class MazeGenerator():
                         raise ConfigError(f"Parameter: {key} too big")
                     conf[key] = value
                 elif key == "PERFECT":
+                    print(conf_dict["PERFECT"])
                     if conf_dict["PERFECT"].lower() not in ["true", "false"]:
                         raise ConfigError("PERFECT must be True or False")
                     else:
-                        conf[key] = bool(conf_dict[key])
+                        temp = conf_dict["PERFECT"].lower()
+                        conf[key] = True if temp == "true" else False
                 elif key == "OUTPUT_FILE":
                     if not conf_dict["OUTPUT_FILE"].endswith(".txt"):
                         raise ConfigError("Output file must be format '.txt'")

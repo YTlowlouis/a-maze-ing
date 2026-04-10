@@ -194,6 +194,22 @@ class Maze():
                     if v_pass ^ h_pass:
                         if random.randint(1, 15) == 1:
                             cell.is_wall = False
+        for y in range(1, len(self.maze) - 1):
+            for x in range(1, len(self.maze[y]) - 1):
+                cell = self.maze[y][x]
+
+                if cell.is_wall and not cell.is_42:
+                    if y % 2 == 0 and x % 2 == 0:
+                        continue
+
+                    v_pass = not self.maze[y-1][x].is_wall and \
+                        not self.maze[y+1][x].is_wall
+                    h_pass = not self.maze[y][x-1].is_wall and \
+                        not self.maze[y][x+1].is_wall
+
+                    if v_pass ^ h_pass:
+                        cell.is_wall = False
+                        return
 
 
 class Cell():

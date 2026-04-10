@@ -35,9 +35,9 @@ class Maze():
         for i in range(self.height * 2 + 1):
             lst_temp: list[Cell] = []
             for j in range(self.width * 2 + 1):
-                if i == self.entry[0] and j == self.entry[1]:
+                if i == self.entry[0] * 2 + 1 and j == self.entry[1] * 2 + 1:
                     lst_temp.append(Entry())
-                elif i == self.exit[0] and j == self.exit[1]:
+                elif i == self.exit[0] * 2 + 1 and j == self.exit[1] * 2 + 1:
                     lst_temp.append(Exit())
                 else:
                     true_or_false = i % 2 == 0 or j % 2 == 0
@@ -132,9 +132,10 @@ class Maze():
             for cell in row:
                 cell.is_path = False
 
-        entry = self.entry
-        target: tuple[int, int] = self.exit
-        print(self.exit)
+        entry: tuple[int, int] = (self.entry[0] * 2 + 1,
+                                  self.entry[1] * 2 + 1)
+        target: tuple[int, int] = (self.exit[0] * 2 + 1,
+                                   self.exit[1] * 2 + 1)
         moves: dict[tuple[int, int], tuple[int, int] | None] = {entry: None}
         queue = deque([entry])
 
@@ -174,17 +175,23 @@ class Maze():
 
 
 class Cell():
-    def __init__(self, is_wall: bool = False):
+    def __init__(self, is_wall: bool = False,
+                 is_visited: bool = False,
+                 is_42: bool = False,
+                 is_path: bool = False,
+                 exit_point: bool = False,
+                 entry_point: bool = False,
+                 ):
         self.is_wall = is_wall
-        self.is_visited = False
-        self.is_42 = False
-        self.is_path = False
+        self.is_visited = is_visited
+        self.is_42 = is_42
+        self.is_path = is_path
         self.w_north = False
         self.w_south = False
         self.w_east = False
         self.w_west = False
-        self.exit_point = False
-        self.entry_point = False
+        self.exit_point = exit_point
+        self.entry_point = entry_point
 
     def print_self(self, renderer: Renderer) -> None:
         if self.is_path:
@@ -213,11 +220,31 @@ class Cell():
 
 
 class Entry(Cell):
+    def __init__(self, is_wall: bool = False,
+                 is_visited: bool = False,
+                 is_42: bool = False,
+                 is_path: bool = True,
+                 exit_point: bool = False,
+                 entry_point: bool = True) -> None:
+        super().__init__(is_wall, is_visited, is_42,
+                         is_path,
+                         exit_point, entry_point)
+
     def print_self(self, renderer: Renderer) -> None:
         print(f"{renderer.entry_color.value}  {RESET}", end="")
 
 
 class Exit(Cell):
+    def __init__(self, is_wall: bool = False,
+                 is_visited: bool = False,
+                 is_42: bool = False,
+                 is_path: bool = True,
+                 exit_point: bool = True,
+                 entry_point: bool = False) -> None:
+        super().__init__(is_wall, is_visited, is_42,
+                         is_path,
+                         exit_point, entry_point)
+
     def print_self(self, renderer: Renderer) -> None:
         print(f"{renderer.exit_color.value}  {RESET}", end="")
 

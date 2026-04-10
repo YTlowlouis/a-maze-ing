@@ -76,6 +76,8 @@ class MazeGenerator():
                     value = expected_type(conf_dict[key])
                     if value < 3:
                         raise ConfigError(f"Parameter: {key} too short")
+                    if value > 80:
+                        raise ConfigError(f"Parameter: {key} too big")
                     conf[key] = value
                 elif key == "PERFECT":
                     if conf_dict["PERFECT"].lower() not in ["true", "false"]:

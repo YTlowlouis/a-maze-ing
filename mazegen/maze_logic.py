@@ -43,8 +43,14 @@ class Maze():
                     true_or_false = i % 2 == 0 or j % 2 == 0
                     lst_temp.append(Cell(true_or_false))
             maze.append(lst_temp)
+
         self.maze = maze
-        self.inject_42()
+
+        if self.height >= 8 and self.width >= 8:
+            if self.check_inject_42():
+                print("TRUEEEEEEE")
+                self.inject_42()
+
         return maze
 
     def _get_unvisited_neighbors(self,
@@ -81,6 +87,22 @@ class Maze():
                 stack.append((pos_y, pos_x))
             else:
                 stack.pop()
+
+    def check_inject_42(self) -> bool:
+        pattern = PATTERN_42
+        offset_y = (self.height - len(pattern)) // 2
+        offset_x = (self.width - len(pattern[0])) // 2
+
+        for py, row in enumerate(pattern):
+            for px, char in enumerate(row):
+                y = (offset_y + py) * 2 + 1
+                x = (offset_x + px) * 2 + 1
+                cell = self.maze[y][x]
+
+                if char == "X" and (cell.entry_point or cell.exit_point):
+                    return False
+
+        return True
 
     def inject_42(self) -> None:
         if self.height < 5 or self.width < 5:

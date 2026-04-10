@@ -62,13 +62,17 @@ class MazeGenerator():
                         raise ConfigError(f"{key} must have only two values"
                                           " as coordinates")
                     if (
-                        int(conf_dict[key].split(',')[0]) >
+                        int(conf_dict[key].split(',')[0]) >=
                         int(conf_dict["HEIGHT"])
-                        or int(conf_dict[key].split(',')[1]) >
+                        or int(conf_dict[key].split(',')[1]) >=
                         int(conf_dict["WIDTH"])
                     ):
                         raise ConfigError(f"{key} must be"
                                           " inside the maze")
+                    if int(conf_dict[key].split(',')[0]) < 0 or \
+                       int(conf_dict[key].split(',')[1]) < 0:
+                        raise ConfigError("Error, ENTRY and EXIT"
+                                          " must be positive !")
                     conf[key] = (int(conf_dict[key].split(",")[0]),
                                  int(conf_dict[key].split(",")[1]))
                 elif key == "WIDTH" or key == "HEIGHT":

@@ -1,6 +1,0 @@
-build==1.4.2
-importlib_metadata==8.7.1
-packaging==26.0
-pyproject_hooks==1.2.0
-tomli==2.4.1
-zipp==3.23.0

@@ -84,7 +84,6 @@ class MazeGenerator():
                         raise ConfigError(f"Parameter: {key} too big")
                     conf[key] = value
                 elif key == "PERFECT":
-                    print(conf_dict["PERFECT"])
                     if conf_dict["PERFECT"].lower() not in ["true", "false"]:
                         raise ConfigError("PERFECT must be True or False")
                     else:

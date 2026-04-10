@@ -48,7 +48,6 @@ class Maze():
 
         if self.height >= 8 and self.width >= 8:
             if self.check_inject_42():
-                print("TRUEEEEEEE")
                 self.inject_42()
 
         return maze
@@ -248,12 +247,15 @@ class Cell():
     def get_neighbors(self, maze: list, y: int, x: int) -> dict[str, bool]:
         neighbors = {}
         directions = {'N': (-1, 0), 'S': (1, 0), 'W': (0, -1), 'E': (0, 1)}
+        if y % 2 == 0 or x % 2 == 0:
+            return {'N': True, 'S': True, 'E': True, 'W': True}
         for dir, (dy, dx) in directions.items():
             ny, nx = y + dy, x + dx
             if 0 <= ny < len(maze) and 0 <= nx < len(maze[0]):
                 neighbors[dir] = maze[ny][nx].is_wall
             else:
                 neighbors[dir] = True
+
         return neighbors
 
 

@@ -53,7 +53,6 @@ def main() -> None:
     # 4. Génération initiale
     print("Generating maze...")
     mazee.create_paths()
-    print(validated_conf)
     if not validated_conf.get("PERFECT", True):
         mazee.not_perfect()
     raw_path = mazee.find_solution()
@@ -65,16 +64,24 @@ def main() -> None:
 
     with open(validated_conf["OUTPUT_FILE"], 'w') as f:
         for y, row in enumerate(mazee.maze):
+            if y % 2 == 0:
+                continue
+
             to_write = ""
             for x, cell in enumerate(row):
+                if x % 2 == 0:
+                    continue
+
                 neighbors = cell.get_neighbors(mazee.maze, y, x)
                 to_write += convert_to_hex(neighbors)
+
             f.write(to_write)
             f.write('\n')
+
         f.write('\n')
         f.write(f"{mazee.entry[0]},{mazee.entry[1]}\n")
         f.write(f"{mazee.exit[0]},{mazee.exit[1]}\n")
-        f.write(str(path_directions[::-1]))
+        f.write(path_directions)
 
     # 5. Boucle d'interaction (Menu)
 
@@ -111,16 +118,24 @@ def main() -> None:
                 render.render_maze(mazee.maze)
                 with open(validated_conf["OUTPUT_FILE"], 'w') as f:
                     for y, row in enumerate(mazee.maze):
+                        if y % 2 == 0:
+                            continue
+
                         to_write = ""
                         for x, cell in enumerate(row):
+                            if x % 2 == 0:
+                                continue
+
                             neighbors = cell.get_neighbors(mazee.maze, y, x)
                             to_write += convert_to_hex(neighbors)
+
                         f.write(to_write)
                         f.write('\n')
+
                     f.write('\n')
                     f.write(f"{mazee.entry[0]},{mazee.entry[1]}\n")
                     f.write(f"{mazee.exit[0]},{mazee.exit[1]}\n")
-                    f.write(str(path_directions[::-1]))
+                    f.write(path_directions)
 
             elif choice == "2":
                 path_hidden = not path_hidden

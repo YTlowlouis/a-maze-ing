@@ -6,6 +6,7 @@ from mazegen.render_maze import Renderer
 
 
 def convert_to_hex(neighbors: dict) -> str:
+    """Convert a neighbor wall representation to a hexadecimal digit."""
     n = '0' if not neighbors['N'] else '1'
     e = '0' if not neighbors['E'] else '1'
     s = '0' if not neighbors['S'] else '1'
@@ -16,6 +17,7 @@ def convert_to_hex(neighbors: dict) -> str:
 
 
 def main() -> None:
+    """Run the main command-line maze generator application."""
     # 1. Initialisation des outils
     render = Renderer()
     generator = MazeGenerator()

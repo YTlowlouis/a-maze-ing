@@ -4,3 +4,4 @@ m = MazeGenerator(10, 10)
 m.generate()
 
 print(m.get_solution())
+print()

@@ -3,16 +3,19 @@ import random
 
 
 class ConfigError(Exception):
+    """Represent a configuration validation failure."""
     def __init__(self, message: str):
         super().__init__(message)
         self.message = message
 
     def __str__(self) -> str:
+        """Return the error message for the configuration error."""
         return f"{self.message}"
 
 
 class MazeGenerator():
     def get_conf(self, config_file: str) -> dict[str, str]:
+        """Read a configuration file and return a raw dict of values."""
         dct = {}
         try:
             with open(config_file, "r") as f:
@@ -35,6 +38,7 @@ class MazeGenerator():
 
     def validate_conf(self,
                       conf_dict: dict) -> dict:
+        """Validate raw configuration values and convert them to fields."""
         if not isinstance(conf_dict, dict):
             raise ConfigError("Config is not a dict")
 

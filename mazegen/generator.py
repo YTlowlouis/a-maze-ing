@@ -4,9 +4,11 @@ from typing import Any
 
 
 class MazeGenerator():
+    """Create and generate maze layouts from given parameters."""
     def __init__(self, width: int, height: int,
                  perfect: bool = True,
                  seed: int | None = None) -> None:
+        """Initialize a maze generator with dimensions and options."""
         self.width = width
         self.height = height
         self.seed = seed
@@ -17,6 +19,7 @@ class MazeGenerator():
             random.seed(seed)
 
     def generate(self) -> None:
+        """Generate the maze and compute its solution path."""
         config = {
             "WIDTH": self.width,
             "HEIGHT": self.height,
@@ -36,7 +39,9 @@ class MazeGenerator():
         self.maze = maze.maze
 
     def get_maze(self) -> list[Any]:
+        """Return the generated maze grid."""
         return self.maze
 
     def get_solution(self) -> list[tuple[int, int]] | None:
+        """Return the computed path through the maze, if any."""
         return self.path

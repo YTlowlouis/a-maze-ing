@@ -4,7 +4,9 @@ import random
 
 
 class Maze():
+    """A maze structure with generation and pathfinding capabilities."""
     def __init__(self, config: dict):
+        """Initialize the maze and load configuration values."""
         self.config: dict = config
         self.height: int
         self.width: int
@@ -16,6 +18,7 @@ class Maze():
         self.maze = self.create_maze()
 
     def _load_conf(self, config: dict) -> list:
+        """Load the maze configuration values from the parsed config dict."""
         self.height = config["HEIGHT"]
         self.width = config["WIDTH"]
         self.is_perfect = config["PERFECT"]
@@ -31,6 +34,7 @@ class Maze():
             ]
 
     def create_maze(self) -> list:
+        """Build the initial maze grid with walls and empty cells."""
         maze = []
         for i in range(self.height * 2 + 1):
             lst_temp: list[Cell] = []
@@ -55,6 +59,7 @@ class Maze():
     def _get_unvisited_neighbors(self,
                                  current_y: int,
                                  current_x: int) -> list[tuple]:
+        """Return unvisited neighbor cells two steps away for path carving."""
         unvisitied_neighbors = []
         directions = [(0, 2), (0, -2), (2, 0), (-2, 0)]
 
@@ -69,11 +74,13 @@ class Maze():
 
     def _break_wall(self, cell1: tuple[int, int],
                     cell2: tuple[int, int]) -> None:
+        """Remove the wall between two adjacent path cells."""
         y_wall = (cell1[0] + cell2[0]) // 2
         x_wall = (cell1[1] + cell2[1]) // 2
         self.maze[y_wall][x_wall].is_wall = False
 
     def create_paths(self) -> None:
+        """Generate paths through the maze using depth-first search."""
         stack = [(1, 1)]
         self.maze[1][1].is_visited = True
         while stack:
@@ -88,6 +95,7 @@ class Maze():
                 stack.pop()
 
     def check_inject_42(self) -> bool:
+        """Return True if the 42 pattern can be injected into the maze."""
         pattern = PATTERN_42
         offset_y = (self.height - len(pattern)) // 2
         offset_x = (self.width - len(pattern[0])) // 2
@@ -104,6 +112,7 @@ class Maze():
         return True
 
     def inject_42(self) -> None:
+        """Embed the 42 pattern into the maze grid when possible."""
         if self.height < 5 or self.width < 5:
             print("Maze too small to show 42")
             return
@@ -125,6 +134,7 @@ class Maze():
                     cell.is_visited = False
 
     def _get_walkable_neighbors(self, cell: tuple[int, int]) -> list[tuple]:
+        """Return accessible neighboring cells for solution search."""
         directions = [(0, 1), (1, 0), (-1, 0), (0, -1)]
         neighbors = []
         for dy, dx in directions:
@@ -139,6 +149,7 @@ class Maze():
                           moves: dict[tuple[int, int], tuple[int, int] | None],
                           target: tuple[int, int]
                           ) -> list[tuple[int, int]]:
+        """Reconstruct the solution path from the parent move map."""
         path = []
         current: tuple[int, int] | None = target
         while current is not None:
@@ -149,6 +160,7 @@ class Maze():
         return path[::-1]
 
     def find_solution(self) -> list[tuple[int, int]] | None:
+        """Find a path from entry to exit using breadth-first search."""
         for row in self.maze:
             for cell in row:
                 cell.is_path = False
@@ -171,12 +183,14 @@ class Maze():
         return None
 
     def switch_path(self, show: bool) -> None:
+        """Show or hide the discovered solution path in the maze."""
         if not hasattr(self, 'path') or not self.path:
             return
         for curr_y, curr_x in self.path:
             self.maze[curr_y][curr_x].is_path = show
 
     def not_perfect(self) -> None:
+        """Carve extra openings in the maze to make it imperfect."""
         for y in range(1, len(self.maze) - 1):
             for x in range(1, len(self.maze[y]) - 1):
                 cell = self.maze[y][x]
@@ -212,6 +226,7 @@ class Maze():
 
 
 class Cell():
+    """A cell in the maze, which may be a wall, path, or special marker."""
     def __init__(self, is_wall: bool = False,
                  is_visited: bool = False,
                  is_42: bool = False,
@@ -231,6 +246,7 @@ class Cell():
         self.entry_point = entry_point
 
     def print_self(self, renderer: Renderer) -> None:
+        """Print the cell using renderer colors and terminal output."""
         if self.is_path:
             print(f"{renderer.path_color.value}  {RESET}", end="")
         elif self.is_42:
@@ -245,6 +261,7 @@ class Cell():
             print("  ", end="")
 
     def get_neighbors(self, maze: list, y: int, x: int) -> dict[str, bool]:
+        """Return wall presence for the four neighbors of a grid cell."""
         neighbors = {}
         directions = {'N': (-1, 0), 'S': (1, 0), 'W': (0, -1), 'E': (0, 1)}
         if y % 2 == 0 or x % 2 == 0:
@@ -260,6 +277,7 @@ class Cell():
 
 
 class Entry(Cell):
+    """A maze entry cell with special rendering and path behavior."""
     def __init__(self, is_wall: bool = False,
                  is_visited: bool = False,
                  is_42: bool = False,
@@ -275,6 +293,7 @@ class Entry(Cell):
 
 
 class Exit(Cell):
+    """A maze exit cell with special rendering and path behavior."""
     def __init__(self, is_wall: bool = False,
                  is_visited: bool = False,
                  is_42: bool = False,
@@ -290,6 +309,7 @@ class Exit(Cell):
 
 
 def path_to_directions(path: list[tuple[int, int]] | None) -> str:
+    """Convert a path of maze coordinates into cardinal direction letters."""
     moves = []
     if path is None:
         return "No path found"

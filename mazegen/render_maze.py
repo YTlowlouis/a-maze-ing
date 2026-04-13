@@ -3,6 +3,7 @@ import random
 
 
 class Colors(Enum):
+    """Available terminal background colors for rendering."""
     BG_RED = "\033[41m"
     BG_GREEN = "\033[42m"
     BG_YELLOW = "\033[43m"
@@ -27,7 +28,9 @@ PATTERN_42 = [
 
 
 class Renderer():
+    """Renderer for maze cells using ANSI background colors."""
     def __init__(self) -> None:
+        """Initialize renderer colors randomly for the maze display."""
         list_colors = list(Colors)
         self.wall_color = random.choice(list_colors)
         list_colors.remove(self.wall_color)
@@ -41,6 +44,7 @@ class Renderer():
         list_colors.remove(self.is42_color)
 
     def render_maze(self, maze: list[list]) -> None:
+        """Render the provided maze grid to the terminal."""
         for row in maze:
             for cell in row:
                 cell.print_self(self)
